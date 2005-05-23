@@ -29,7 +29,7 @@
 }
 
 - (void)dealloc {
-	NSLog(@"MLImage dealloc: %@", imagePath);	
+	//NSLog(@"MLImage dealloc: %@", imagePath);	
 	if(image != nil) {
 		[transform release];
 		[imagePath release];

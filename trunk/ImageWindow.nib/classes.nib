@@ -1,0 +1,30 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {keyDown = id; }; 
+            CLASS = MLImageView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSView; 
+        }, 
+        {
+            ACTIONS = {keyDown = id; nextImage = id; prevImage = id; }; 
+            CLASS = MLImageWindowController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {imageView = MLImageView; }; 
+            SUPERCLASS = NSWindowController; 
+        }, 
+        {
+            ACTIONS = {
+                menuFullScreen = id; 
+                menuNextImage = id; 
+                menuOpenFile = id; 
+                menuPrevImage = id; 
+            }; 
+            CLASS = MLMainController; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

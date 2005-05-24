@@ -7,7 +7,6 @@
 	if ((self = [super initWithFrame:frameRect]) != nil) {
 		
 		centerImage = NO;
-		
 		image = nil;
 	}
 	return self;
@@ -24,23 +23,27 @@
 }
 
 - (void)drawRect:(NSRect)rect
-{
-	NSGraphicsContext *currentContext = [NSGraphicsContext currentContext];
-	
+{	
 	if(image != nil) {
-		CIImage *ciImage = [image processedImage];
-			
-		CIImage *result = ciImage;
+		// for some mysterious reason, CIContexts created this way are slower than the ones created through
+		// NSGraphicsContext...
+		//CGContextRef cgContext = [[NSGraphicsContext currentContext] graphicsPort];
+		//CIContext *coreContext = [CIContext contextWithCGContext:cgContext options:nil];
+		//NSDictionary *contextOptions = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], @"kCIContextUseSoftwareRenderer", nil];
+		//CIContext *coreContext = [CIContext contextWithCGContext:cgContext options:contextOptions];
+		NSGraphicsContext *currentContext = [NSGraphicsContext currentContext];
+		CIContext *coreContext = [currentContext CIContext];
 		
+		CIImage *ciImage = [image processedImage];
+		CGRect imageRect = [ciImage extent];
 		CGRect cgRect = CGRectMake(NSMinX(rect), NSMinY(rect), NSWidth(rect), NSHeight(rect));
-		CIContext *coreContext = [currentContext CIContext];		
 					
 		if(centerImage) {
-			cgRect.origin.x = (cgRect.size.width - [result extent].size.width)/2;
-			cgRect.origin.y = (cgRect.size.height - [result extent].size.height)/2;
+			cgRect.origin.x = (cgRect.size.width - imageRect.size.width)/2;
+			cgRect.origin.y = (cgRect.size.height - imageRect.size.height)/2;
 		}
 		
-		[coreContext drawImage:result atPoint:cgRect.origin fromRect:[result extent]];
+		[coreContext drawImage:ciImage atPoint:cgRect.origin fromRect:imageRect];
 	}
 }
 

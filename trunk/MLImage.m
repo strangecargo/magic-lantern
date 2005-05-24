@@ -62,20 +62,20 @@
 	}
 }
 
-- (CGSize)maxImageSizeForVisibleSize:(CGSize)visibleSize {
+- (CGSize)maxImageSizeForAvailableSize:(CGSize)availableSize {
 	CGSize imageSize = [[self transformedImage] extent].size;
 	
 	//check to see if image can fit.
-	if(imageSize.height > visibleSize.height || imageSize.width > visibleSize.width) {
-		CGSize newSize = visibleSize;
+	if(imageSize.height > availableSize.height || imageSize.width > availableSize.width) {
+		CGSize newSize = availableSize;
 		
 		//compare aspect ratios
-		if(imageSize.height/imageSize.width > visibleSize.height/visibleSize.width) {
+		if(imageSize.height/imageSize.width > availableSize.height/availableSize.width) {
 			//scale down the width of the new content rectangle to the right size.
-			newSize.width = imageSize.width * visibleSize.height/imageSize.height;
+			newSize.width = imageSize.width * availableSize.height/imageSize.height;
 		} else {
 			//scale down the height instead.
-			newSize.height = imageSize.height * visibleSize.width/imageSize.width;
+			newSize.height = imageSize.height * availableSize.width/imageSize.width;
 		}
 		
 		return(newSize);

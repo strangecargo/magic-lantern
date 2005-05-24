@@ -49,7 +49,7 @@
 }
 
 - (void)windowDidLoad {
-	[self updateViewWithImage:[directory currentImage]];
+	[self updateViewWithImage:[directory currentImage]];	
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification {
@@ -152,7 +152,7 @@
 	visibleContentSize.height = visibleContentRect.size.height;
 	visibleContentSize.width = visibleContentRect.size.width;
 
-	CGSize newContentSize = [currentImage maxImageSizeForVisibleSize:visibleContentSize];
+	CGSize newContentSize = [currentImage maxImageSizeForAvailableSize:visibleContentSize];
 	NSRect newContentRect = NSMakeRect(NSMinX(currentContentRect), NSMaxY(currentContentRect) - newContentSize.height, newContentSize.width, newContentSize.height);
 	[currentImage setTargetRectSize:newContentRect.size];
 

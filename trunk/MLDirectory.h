@@ -26,6 +26,8 @@
 - (MLImage *)prevImage;
 - (MLImage *)nextImage;
 
+- (NSArray *)images;
+
 - (unsigned int)count;
 - (unsigned int)index;
 - (void)setIndex:(unsigned int)newIndex;

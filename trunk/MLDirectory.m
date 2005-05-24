@@ -133,6 +133,10 @@
 	return(nil);
 }
 
+- (NSArray *)images {
+	return(images);
+}
+
 - (unsigned int)count {
 	return([images count]);
 }

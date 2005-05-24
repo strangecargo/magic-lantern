@@ -55,6 +55,28 @@
 	}
 }
 
+- (CGSize)maxImageSizeForVisibleSize:(CGSize)visibleSize {
+	CGSize imageSize = [[self transformedImage] extent].size;
+	
+	//check to see if image can fit.
+	if(imageSize.height > visibleSize.height || imageSize.width > visibleSize.width) {
+		CGSize newSize = visibleSize;
+		
+		//compare aspect ratios
+		if(imageSize.height/imageSize.width > visibleSize.height/visibleSize.width) {
+			//scale down the width of the new content rectangle to the right size.
+			newSize.width = imageSize.width * visibleSize.height/imageSize.height;
+		} else {
+			//scale down the height instead.
+			newSize.height = imageSize.height * visibleSize.width/imageSize.width;
+		}
+		
+		return(newSize);
+	}
+	
+	return(imageSize);
+}
+
 - (CIImage *)transformedImage {
 	[self loadDataIfNeeded];
 	

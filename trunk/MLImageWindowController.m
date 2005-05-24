@@ -135,62 +135,29 @@
 		MLImageView *activeView = [self activeImageView];
 		[[self window] setTitle:[[newImage path] lastPathComponent]];
 		[activeView setImage:newImage];
-		[self updateSizeAndScale];
-		//[imageView display];
-		//if(fullScreenMode)
+		[self updateWindowFrame];
 		[activeView setNeedsDisplay:YES];
 	}
 }
 
-// mostly ganked from Magic Lantern 1.0.1
-- (void)updateSizeAndScale {
+- (void)updateWindowFrame {
 	NSWindow *window = [self window];
 	MLImage *currentImage = [directory currentImage];
-	CGSize imageSize = [[currentImage transformedImage] extent].size;
 	
 	NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
-	NSRect currentFrame = [window frame];
+	NSRect currentContentRect = [window contentRectForFrameRect:[window frame]];
+	NSRect visibleContentRect = [window contentRectForFrameRect:visibleFrame];
 	
-	//this is actually the current content Rect at the moment.
-	NSRect newContentRect = [window contentRectForFrameRect:currentFrame];
-	
-	newContentRect.origin = currentFrame.origin;
-	newContentRect.origin.y += newContentRect.size.height - imageSize.height;
-	newContentRect.size.height = imageSize.height;
-	newContentRect.size.width = imageSize.width;
-	
-	NSRect newFrame = [window frameRectForContentRect:newContentRect];
-	
-	//check to see if the new frame will actually fit on the screen
-	if(newFrame.size.height > visibleFrame.size.height || newFrame.size.width > visibleFrame.size.width) {
-		//set newFrame to largest content rectangle that can fit in the current screen frame.
-		newContentRect = [window contentRectForFrameRect:visibleFrame];
+	CGSize visibleContentSize;
+	visibleContentSize.height = visibleContentRect.size.height;
+	visibleContentSize.width = visibleContentRect.size.width;
 
-		//compare aspect ratios of image and screen.
-		if(imageSize.height/imageSize.width > newContentRect.size.height/newContentRect.size.width) {
-			//scale down the width of the new content rectangle to the right size.
-			newContentRect.size.width = imageSize.width * newContentRect.size.height/imageSize.height;
-		} else {
-			//scale down the height instead.
-			newContentRect.size.height = imageSize.height * newContentRect.size.width/imageSize.width;
-		}
+	CGSize newContentSize = [currentImage maxImageSizeForVisibleSize:visibleContentSize];
+	NSRect newContentRect = NSMakeRect(NSMinX(currentContentRect), NSMaxY(currentContentRect) - newContentSize.height, newContentSize.width, newContentSize.height);
+	[currentImage setTargetRectSize:newContentRect.size];
 
-		//do this before calling floor() on the values.
-		[currentImage setTargetRectSize:newContentRect.size];
-		newContentRect.size.width = floor(newContentRect.size.width);
-		newContentRect.size.height = floor(newContentRect.size.height);
-		
-		newFrame = [window frameRectForContentRect:newContentRect];
-		newFrame.origin = currentFrame.origin;
-		newFrame.origin.y += currentFrame.size.height - newFrame.size.height;
-	} else {
-		//only do this if we didn't floor() the values.
-		[currentImage setTargetRectSize:newContentRect.size];
-	}
-
-	if(!fullScreenMode) {
-		[window setFrame:newFrame display:YES animate:NO];
-	}
+	if(!fullScreenMode)
+		[window setFrame:[window frameRectForContentRect:newContentRect] display:YES animate:NO];
 }
 
 - (BOOL)isFullScreen {

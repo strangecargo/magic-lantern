@@ -24,6 +24,7 @@
 - (NSAffineTransform *)transformation;
 - (NSSize)targetRectSize;
 - (void)setTargetRectSize:(NSSize)size;
+- (CGSize)maxImageSizeForVisibleSize:(CGSize)visibleSize;
 - (CIImage *)transformedImage;
 - (CIImage *)processedImage;
 

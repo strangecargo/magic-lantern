@@ -6,7 +6,6 @@
 //  Copyright 2005 __MyCompanyName__. All rights reserved.
 //
 
-#import <QuartzCore/QuartzCore.h>
 #import <sys/param.h>
 #import "MLImage.h"
 
@@ -19,6 +18,7 @@
 		imagePath = filePath;
 
 		transform = [[NSAffineTransform alloc] init];
+		imageAccum = nil;
 		
 		[imagePath retain];
 		
@@ -36,6 +36,8 @@
 		[imageData release];
 		[image release];
 		
+		if(imageAccum != nil)
+			[imageAccum release];
 	}
 		
 	[super dealloc];
@@ -51,7 +53,12 @@
 
 - (void)setTargetRectSize:(NSSize)size {
 	if(targetRectSize.width != size.width || targetRectSize.height != size.height) {
-		targetRectSize = size;		
+		targetRectSize = size;
+		
+		if(imageAccum != nil) {
+			[imageAccum release];
+			imageAccum = nil;
+		}
 	}
 }
 
@@ -92,20 +99,35 @@
 - (CIImage *)processedImage {
 	[self loadDataIfNeeded];
 
-	CIImage *intermediate = nil;
-	CIFilter *affineFilter = [CIFilter filterWithName:@"CIAffineTransform"];
-	[affineFilter setValue:transform forKey:@"inputTransform"];
-	[affineFilter setValue:image forKey:@"inputImage"];
-	intermediate = [affineFilter valueForKey:@"outputImage"];
+	if(imageAccum == nil) {
+		CIImage *intermediate = nil;
+		CIFilter *affineFilter = [CIFilter filterWithName:@"CIAffineTransform"];
+		[affineFilter setValue:transform forKey:@"inputTransform"];
+		[affineFilter setValue:image forKey:@"inputImage"];
+		intermediate = [affineFilter valueForKey:@"outputImage"];
+		
+		float scaleFactor = targetRectSize.height / [intermediate extent].size.height;
+		CIFilter *scaleFilter = [CIFilter filterWithName:@"CILanczosScaleTransform"];
+		[scaleFilter setDefaults];
+		[scaleFilter setValue:[NSNumber numberWithFloat:scaleFactor] forKey:@"inputScale"];
+		[scaleFilter setValue:intermediate forKey:@"inputImage"];
+		intermediate = [scaleFilter valueForKey:@"outputImage"];
 	
-	float scaleFactor = targetRectSize.height / [intermediate extent].size.height;
-	CIFilter *scaleFilter = [CIFilter filterWithName:@"CILanczosScaleTransform"];
-	[scaleFilter setDefaults];
-	[scaleFilter setValue:[NSNumber numberWithFloat:scaleFactor] forKey:@"inputScale"];
-	[scaleFilter setValue:intermediate forKey:@"inputImage"];
-	intermediate = [scaleFilter valueForKey:@"outputImage"];
+		[self accumulateImage:intermediate];
+	}
 	
-	return(intermediate);
+	return([imageAccum image]);
+	//return(intermediate);
+}
+
+- (void)accumulateImage:(CIImage *)newAccumImage {
+	if(imageAccum != nil) {
+		[imageAccum release];
+		imageAccum = nil;
+	}
+	
+	imageAccum = [[CIImageAccumulator alloc] initWithExtent:[newAccumImage extent] format:kCIFormatARGB8];
+	[imageAccum setImage:newAccumImage];
 }
 
 - (void)loadDataIfNeeded {

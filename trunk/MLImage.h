@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <QuartzCore/QuartzCore.h>
 
 @interface MLImage : NSObject {
 	NSString *imagePath;
@@ -16,6 +17,7 @@
 	
 	NSData *imageData;
 	CIImage *image;
+	CIImageAccumulator *imageAccum;
 }
 
 - (id)initFromFilePath:(NSString *)filePath;
@@ -27,6 +29,7 @@
 - (CGSize)maxImageSizeForVisibleSize:(CGSize)visibleSize;
 - (CIImage *)transformedImage;
 - (CIImage *)processedImage;
+- (void)accumulateImage:(CIImage *)newAccumImage;
 
 - (void)loadDataIfNeeded;
 - (NSData *)imageData;

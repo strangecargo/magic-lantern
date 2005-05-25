@@ -36,7 +36,7 @@
 
 - (MLImageView *)activeImageView;
 - (void)updateViewWithImage:(MLImage *)newImage;
-- (void)updateWindowFrame;
+- (void)updateWindowFrameForImage:(MLImage *)imag;
 
 - (BOOL)isFullScreen;
 - (void)toggleFullScreen;

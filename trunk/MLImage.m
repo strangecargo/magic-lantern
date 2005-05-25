@@ -17,8 +17,8 @@
 	if(self) {
 		imagePath = filePath;
 
-		transform = [[NSAffineTransform alloc] init];
 		imageAccum = nil;
+		rotation = 0.0;
 		
 		[imagePath retain];
 		
@@ -31,7 +31,6 @@
 - (void)dealloc {
 	//NSLog(@"MLImage dealloc: %@", imagePath);	
 	if(image != nil) {
-		[transform release];
 		[imagePath release];
 		[imageData release];
 		[image release];
@@ -43,39 +42,39 @@
 	[super dealloc];
 }
 
-- (NSAffineTransform *)transformation {
-	return(transform);
+- (void)rotateByDegrees:(float)degrees {
+	rotation += degrees;
+	
+	[imageAccum release];
+	imageAccum = nil;
+	scaleFactor = [self maxImageSizeForAvailableSize].height / [[self transformedImage] extent].size.height;
+
 }
 
-- (NSSize)targetRectSize {
-	return(targetRectSize);
-}
-
-- (void)setTargetRectSize:(NSSize)size {
-	if(targetRectSize.width != size.width || targetRectSize.height != size.height) {
-		targetRectSize = size;
-		
-		if(imageAccum != nil) {
-			[imageAccum release];
-			imageAccum = nil;
-		}
+- (void)setAvailableSize:(CGSize)newSize {
+	if(maxSize.height != newSize.height || maxSize.width != newSize.width) {
+		maxSize = newSize;
+		scaleFactor = [self maxImageSizeForAvailableSize].height / [[self transformedImage] extent].size.height;
+		NSLog(@"Scalefactor: %f", scaleFactor);
+		[imageAccum release];
+		imageAccum = nil;
 	}
 }
 
-- (CGSize)maxImageSizeForAvailableSize:(CGSize)availableSize {
+- (CGSize)maxImageSizeForAvailableSize {
 	CGSize imageSize = [[self transformedImage] extent].size;
 	
 	//check to see if image can fit.
-	if(imageSize.height > availableSize.height || imageSize.width > availableSize.width) {
-		CGSize newSize = availableSize;
+	if(imageSize.height > maxSize.height || imageSize.width > maxSize.width) {
+		CGSize newSize = maxSize;
 		
 		//compare aspect ratios
-		if(imageSize.height/imageSize.width > availableSize.height/availableSize.width) {
+		if(imageSize.height/imageSize.width > maxSize.height/maxSize.width) {
 			//scale down the width of the new content rectangle to the right size.
-			newSize.width = imageSize.width * availableSize.height/imageSize.height;
+			newSize.width = imageSize.width * maxSize.height/imageSize.height;
 		} else {
 			//scale down the height instead.
-			newSize.height = imageSize.height * availableSize.width/imageSize.width;
+			newSize.height = imageSize.height * maxSize.width/imageSize.width;
 		}
 		
 		return(newSize);
@@ -87,11 +86,16 @@
 - (CIImage *)transformedImage {
 	[self loadDataIfNeeded];
 	
-	CIImage *intermediate = nil;
-	CIFilter *affineFilter = [CIFilter filterWithName:@"CIAffineTransform"];
-	[affineFilter setValue:transform forKey:@"inputTransform"];
-	[affineFilter setValue:image forKey:@"inputImage"];
-	intermediate = [affineFilter valueForKey:@"outputImage"];
+	CIImage *intermediate = image;
+	
+	if(rotation != 0.0) {
+		NSAffineTransform *transform = [NSAffineTransform transform];
+		[transform rotateByDegrees:rotation];
+		CIFilter *affineFilter = [CIFilter filterWithName:@"CIAffineTransform"];
+		[affineFilter setValue:transform forKey:@"inputTransform"];
+		[affineFilter setValue:image forKey:@"inputImage"];
+		intermediate = [affineFilter valueForKey:@"outputImage"];
+	}
 	
 	return(intermediate);
 }
@@ -99,20 +103,22 @@
 - (CIImage *)processedImage {
 	[self loadDataIfNeeded];
 
-	if(imageAccum == nil) {
-		CIImage *intermediate = nil;
-		CIFilter *affineFilter = [CIFilter filterWithName:@"CIAffineTransform"];
-		[affineFilter setValue:transform forKey:@"inputTransform"];
-		[affineFilter setValue:image forKey:@"inputImage"];
-		intermediate = [affineFilter valueForKey:@"outputImage"];
-		
-		float scaleFactor = targetRectSize.height / [intermediate extent].size.height;
-		CIFilter *scaleFilter = [CIFilter filterWithName:@"CILanczosScaleTransform"];
-		[scaleFilter setDefaults];
-		[scaleFilter setValue:[NSNumber numberWithFloat:scaleFactor] forKey:@"inputScale"];
-		[scaleFilter setValue:intermediate forKey:@"inputImage"];
-		intermediate = [scaleFilter valueForKey:@"outputImage"];
+	if(rotation == 0.0 && scaleFactor == 1.0)
+		return(image);
 	
+	if(imageAccum == nil) {
+		CIImage *intermediate = image;
+		
+		intermediate = [self transformedImage];
+
+		if(scaleFactor != 1.0) {
+			CIFilter *scaleFilter = [CIFilter filterWithName:@"CILanczosScaleTransform"];
+			[scaleFilter setDefaults];
+			[scaleFilter setValue:[NSNumber numberWithFloat:scaleFactor] forKey:@"inputScale"];
+			[scaleFilter setValue:intermediate forKey:@"inputImage"];
+			intermediate = [scaleFilter valueForKey:@"outputImage"];
+		}
+		
 		[self accumulateImage:intermediate];
 	}
 	
@@ -134,11 +140,7 @@
 	if(image == nil) {
 		imageData = [NSData dataWithContentsOfMappedFile:imagePath];
 		image = [CIImage imageWithData:imageData];
-		
-		CGSize imageSize = [image extent].size;
-		targetRectSize.height = imageSize.height;
-		targetRectSize.width = imageSize.width;
-		
+				
 		[imageData retain];
 		[image retain];
 	}

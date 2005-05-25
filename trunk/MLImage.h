@@ -12,26 +12,30 @@
 @interface MLImage : NSObject {
 	NSString *imagePath;
 
-	NSAffineTransform *transform;
-	NSSize targetRectSize;
-	
+	float scaleFactor;
+	float rotation;
+		
 	NSData *imageData;
 	CIImage *image;
 	CIImageAccumulator *imageAccum;
+	CGSize maxSize;
 }
 
 - (id)initFromFilePath:(NSString *)filePath;
-- (NSString *)path;
 
-- (NSAffineTransform *)transformation;
-- (NSSize)targetRectSize;
-- (void)setTargetRectSize:(NSSize)size;
-- (CGSize)maxImageSizeForAvailableSize:(CGSize)availableSize;
+- (void)rotateByDegrees:(float)degrees;
+
+
+- (void)setAvailableSize:(CGSize)newSize;
+- (CGSize)maxImageSizeForAvailableSize;
+
 - (CIImage *)transformedImage;
 - (CIImage *)processedImage;
 - (void)accumulateImage:(CIImage *)newAccumImage;
 
 - (void)loadDataIfNeeded;
+
+- (NSString *)path;
 - (NSData *)imageData;
 - (CIImage *)image;
 

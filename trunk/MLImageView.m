@@ -29,8 +29,9 @@
 		// NSGraphicsContext...
 		//CGContextRef cgContext = [[NSGraphicsContext currentContext] graphicsPort];
 		//CIContext *coreContext = [CIContext contextWithCGContext:cgContext options:nil];
-		//NSDictionary *contextOptions = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], @"kCIContextUseSoftwareRenderer", nil];
+		//NSDictionary *contextOptions = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], @"kCIContextUseSoftwareRenderer", CGColorSpaceCreateDeviceRGB(), @"kCIContextOutputColorSpace", CGColorSpaceCreateDeviceRGB(), @"kCIContextWorkingColorSpace", nil];
 		//CIContext *coreContext = [CIContext contextWithCGContext:cgContext options:contextOptions];
+		//CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		NSGraphicsContext *currentContext = [NSGraphicsContext currentContext];
 		CIContext *coreContext = [currentContext CIContext];
 		

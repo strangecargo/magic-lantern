@@ -88,9 +88,7 @@
 	MLImage *currentImage = [directory currentImage];
 	
 	if(currentImage != nil) {
-		NSAffineTransform *transform = [currentImage transformation];
-	
-		[transform rotateByDegrees:90.0];
+		[currentImage rotateByDegrees:90.0];
 		[self updateViewWithImage:currentImage];
 	}
 }
@@ -98,10 +96,8 @@
 - (void)rotateCW {
 	MLImage *currentImage = [directory currentImage];
 	
-	if(currentImage != nil) {
-		NSAffineTransform *transform = [currentImage transformation];
-				
-		[transform rotateByDegrees:-90.0];
+	if(currentImage != nil) {				
+		[currentImage rotateByDegrees:-90.0];
 		[self updateViewWithImage:currentImage];
 	}
 }
@@ -132,32 +128,33 @@
 
 - (void)updateViewWithImage:(MLImage *)newImage {
 	if(newImage != nil) {
+		NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
+		NSRect visibleContentRect = [[self window] contentRectForFrameRect:visibleFrame];
+		CGSize visibleContentSize;
+		visibleContentSize.height = visibleContentRect.size.height;
+		visibleContentSize.width = visibleContentRect.size.width;
+		
 		MLImageView *activeView = [self activeImageView];
 		[[self window] setTitle:[[newImage path] lastPathComponent]];
+		[newImage setAvailableSize:visibleContentSize];
 		[activeView setImage:newImage];
-		[self updateWindowFrame];
+		[self updateWindowFrameForImage:newImage];
 		[activeView setNeedsDisplay:YES];
 	}
 }
 
-- (void)updateWindowFrame {
+- (void)updateWindowFrameForImage:(MLImage *)image {
 	NSWindow *window = [self window];
-	MLImage *currentImage = [directory currentImage];
-	
-	NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
 	NSRect currentContentRect = [window contentRectForFrameRect:[window frame]];
-	NSRect visibleContentRect = [window contentRectForFrameRect:visibleFrame];
 	
-	CGSize visibleContentSize;
-	visibleContentSize.height = visibleContentRect.size.height;
-	visibleContentSize.width = visibleContentRect.size.width;
-
-	CGSize newContentSize = [currentImage maxImageSizeForAvailableSize:visibleContentSize];
+	CGSize newContentSize = [image maxImageSizeForAvailableSize];
 	NSRect newContentRect = NSMakeRect(NSMinX(currentContentRect), NSMaxY(currentContentRect) - newContentSize.height, newContentSize.width, newContentSize.height);
-	[currentImage setTargetRectSize:newContentRect.size];
 
-	if(!fullScreenMode)
+	if(!fullScreenMode) {
+		newContentRect.size.width = floor(newContentRect.size.width);
+		newContentRect.size.height = floor(newContentRect.size.height);
 		[window setFrame:[window frameRectForContentRect:newContentRect] display:YES animate:NO];
+	}
 }
 
 - (BOOL)isFullScreen {

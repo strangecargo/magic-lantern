@@ -17,6 +17,7 @@
 		
 	NSData *imageData;
 	CIImage *image;
+	
 	CIImageAccumulator *imageAccum;
 	CGSize maxSize;
 }

@@ -49,7 +49,9 @@
 }
 
 - (void)windowDidLoad {
-	[self updateViewWithImage:[directory currentImage]];	
+	[self updateViewWithImage:[directory currentImage]];
+	
+	[NSThread detachNewThreadSelector:@selector(preloadThread:) toTarget:self withObject:nil];
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification {
@@ -130,6 +132,7 @@
 	if(newImage != nil) {
 		NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
 		NSRect visibleContentRect = [[self window] contentRectForFrameRect:visibleFrame];
+		
 		CGSize visibleContentSize;
 		visibleContentSize.height = visibleContentRect.size.height;
 		visibleContentSize.width = visibleContentRect.size.width;
@@ -220,6 +223,49 @@
 	
 	[fullScreenWindow release];
 	[fullScreenImageView release];
+}
+
+//threading junks
+- (void)preloadThread:(id)arg {
+	unsigned int i;
+	
+	NSLog(@"preload thread started.");
+		
+	for(i = 0; i < [directory count]; i++) {
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		MLImage *image = [[directory images] objectAtIndex:i];
+
+		NSLog(@"Preloading %@", [image path]);
+		
+		NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
+		NSRect visibleContentRect = [[self window] contentRectForFrameRect:visibleFrame];
+		
+		CGSize visibleContentSize;
+		visibleContentSize.height = visibleContentRect.size.height;
+		visibleContentSize.width = visibleContentRect.size.width;
+		
+		[image setAvailableSize:visibleContentSize];
+		
+		CIImage *ciImage = [image processedImage];
+		
+		NSImageView *preloadView = [preloadWindow contentView];
+		[preloadView lockFocus];
+
+		NSGraphicsContext *nsContext = [NSGraphicsContext currentContext];
+		CIContext *ciContext = [nsContext CIContext];
+		if(nsContext == nil) NSLog(@"current context nil");
+		
+		//yeeeeah. this isn't in the header. but it *is* in the nm output!
+		[ciContext render:ciImage];
+		
+		[preloadView unlockFocus];
+		NSLog(@"Preloaded.");
+		
+		[pool release];
+	}
+
+	NSLog(@"preload thread exiting.");
+	//[NSThread exit];
 }
 
 @end

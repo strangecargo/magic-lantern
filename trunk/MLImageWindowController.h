@@ -15,12 +15,16 @@
 
 	MLDirectory *directory;
 	IBOutlet MLImageView *imageView;
+	IBOutlet NSWindow *preloadWindow;
 	
 	//full screen craps.
 	BOOL fullScreenMode;
 	NSWindow *normalWindow;
 	MLFullScreenWindow *fullScreenWindow;
 	MLImageView *fullScreenImageView;
+	
+	//threaded preloading
+	NSThread *preloadThread;
 }
 
 - (id)initWithPath:(NSString *)path;
@@ -42,4 +46,6 @@
 - (void)toggleFullScreen;
 - (void)goFullScreen;
 - (void)returnFromFullScreen;
+
+- (void)preloadThread:(id)arg;
 @end

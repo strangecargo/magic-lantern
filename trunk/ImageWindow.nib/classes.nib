@@ -8,10 +8,9 @@
             SUPERCLASS = NSView; 
         }, 
         {
-            ACTIONS = {keyDown = id; nextImage = id; prevImage = id; }; 
             CLASS = MLImageWindowController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {imageView = MLImageView; }; 
+            OUTLETS = {imageView = MLImageView; preloadWindow = NSWindow; }; 
             SUPERCLASS = NSWindowController; 
         }, 
         {

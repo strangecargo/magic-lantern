@@ -32,6 +32,7 @@
 		//NSDictionary *contextOptions = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO], @"kCIContextUseSoftwareRenderer", CGColorSpaceCreateDeviceRGB(), @"kCIContextOutputColorSpace", CGColorSpaceCreateDeviceRGB(), @"kCIContextWorkingColorSpace", nil];
 		//CIContext *coreContext = [CIContext contextWithCGContext:cgContext options:contextOptions];
 		//CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+		[self lockFocus];
 		NSGraphicsContext *currentContext = [NSGraphicsContext currentContext];
 		CIContext *coreContext = [currentContext CIContext];
 		
@@ -45,6 +46,7 @@
 		}
 		
 		[coreContext drawImage:ciImage atPoint:cgRect.origin fromRect:imageRect];
+		[self unlockFocus];
 	}
 }
 

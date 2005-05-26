@@ -119,6 +119,7 @@
 			intermediate = [scaleFilter valueForKey:@"outputImage"];
 		}
 		
+		NSLog(@"Image accumulating: %@", imagePath);
 		[self accumulateImage:intermediate];
 	}
 	
@@ -134,6 +135,7 @@
 	
 	imageAccum = [[CIImageAccumulator alloc] initWithExtent:[newAccumImage extent] format:kCIFormatARGB8];
 	[imageAccum setImage:newAccumImage];
+	//[imageAccum commitUpdates:nil];
 }
 
 - (void)loadDataIfNeeded {

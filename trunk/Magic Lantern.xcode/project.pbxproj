@@ -57,6 +57,7 @@
 //104
 		1058C7A0FEA54F0111CA2CBB = {
 			children = (
+				9D842772084849C100758359,
 				9D2A1F520841581F00D9C179,
 				9D44813E083DD47C00ECB988,
 				1058C7A1FEA54F0111CA2CBB,
@@ -391,6 +392,7 @@
 				8D11072F0486CEB800E47090,
 				9D44813F083DD47C00ECB988,
 				9D2A1F530841581F00D9C179,
+				9D842773084849C100758359,
 			);
 			isa = PBXFrameworksBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -473,6 +475,20 @@
 		};
 		9D7FD3DF083B11DF002051D0 = {
 			fileRef = 9D7FD3DE083B11DF002051D0;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		9D842772084849C100758359 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = ApplicationServices.framework;
+			path = /System/Library/Frameworks/ApplicationServices.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		9D842773084849C100758359 = {
+			fileRef = 9D842772084849C100758359;
 			isa = PBXBuildFile;
 			settings = {
 			};

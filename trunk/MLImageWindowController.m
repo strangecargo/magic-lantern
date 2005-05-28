@@ -241,31 +241,85 @@
 
 - (void)renderImage:(MLImage *)image forSize:(CGSize)size{
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	//struct timespec sleep_interval;
+	//sleep_interval.tv_sec = 0;
+	//sleep_interval.tv_nsec = 250000000;
+	
 	[image lock];
 					
 	[image setAvailableSize:size];
 	
 	if([image shouldPreRender]) {
-		NSLog(@"Preloading %@", [image path]);
-		CIImage *ciImage = [image processedImage];
-	
-		NSImageView *preloadView = [preloadWindow contentView];
-		[preloadView lockFocus];
-	
-		NSGraphicsContext *nsContext = [NSGraphicsContext currentContext];	
-		CIContext *ciContext = [nsContext CIContext];
-		if(nsContext == nil) NSLog(@"current context nil");
-	
-		//yeeeeah. this isn't in the header. but it *is* in the nm output!
-		[image accumulateToRenderCache:ciImage];
-		[ciContext render:[image renderCacheImage]];
-
-		[preloadView unlockFocus];
-		NSLog(@"Preloaded.");		
+		[self renderImageUsingBitmapContext:image forSize:size];
+		//[self renderImageUsingWindowContext:image forSize:size];
 	}
 	
 	[image unlock];
+	
+	//nanosleep(&sleep_interval, NULL);
+	
 	[pool release];
+}
+
+- (void)renderImageUsingBitmapContext:(MLImage *)image forSize:(CGSize)size {
+	CIImage *ciImage = [image processedImage];
+	
+	CGRect ciExtent = [ciImage extent];
+	
+	CGContextRef cgContext = NULL;
+	CGColorSpaceRef colorSpace;
+	void *bitmapData;
+	int bitmapBytesPerRow = ciExtent.size.width * 4;
+	int bitmapByteCount = bitmapBytesPerRow * ciExtent.size.height;
+	
+	colorSpace = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
+	bitmapData = malloc(bitmapByteCount);
+	
+	if(bitmapData == NULL) {
+		NSLog(@"oh craps! couldn't allocate memory.");
+		return;
+	}
+	
+	cgContext = CGBitmapContextCreate(bitmapData, ciExtent.size.width, ciExtent.size.height, 8, bitmapBytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast);
+	CGColorSpaceRelease(colorSpace);
+	
+	if(cgContext == NULL) {
+		free(bitmapData);
+		NSLog(@"could not create CG context.");
+		return;
+	}
+
+	//NSDictionary *contextOptions = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], @"kCIContextUseSoftwareRenderer", nil];
+	CIContext *ciContext = [CIContext contextWithCGContext:cgContext options:nil];
+	
+	[ciContext drawImage:ciImage atPoint:CGPointZero fromRect:[ciImage extent]];
+	
+	CGImageRef cgImage = CGBitmapContextCreateImage(cgContext);
+	ciImage = [CIImage imageWithCGImage:cgImage];
+	[image accumulateToRenderCache:ciImage];
+	
+	CGContextRelease(cgContext);
+	CGImageRelease(cgImage);
+	free(bitmapData);
+}
+
+- (void)renderImageUsingWindowContext:(MLImage *)image forSize:(CGSize)size {
+	NSLog(@"Preloading %@", [image path]);
+	CIImage *ciImage = [image processedImage];
+		
+	NSImageView *preloadView = [preloadWindow contentView];
+	[preloadView lockFocus];
+	 
+	NSGraphicsContext *nsContext = [NSGraphicsContext currentContext];	
+	CIContext *ciContext = [nsContext CIContext];
+	if(nsContext == nil) NSLog(@"current context nil");
+	 
+	//yeeeeah. this isn't in the header. but it *is* in the nm output!
+	[image accumulateToRenderCache:ciImage];
+	[ciContext render:[image renderCacheImage]];
+	
+	[preloadView unlockFocus];
 }
 
 - (void)preloadThread:(id)arg {
@@ -284,6 +338,7 @@
 		i++;
 		BOOL withinBounds = NO;
 		int currentIndex = i + centerIndex;
+		
 		
 		if(currentIndex < [directory count]) {
 			CGSize visibleSize = [self visibleContentCGSize];

@@ -50,5 +50,7 @@
 - (void)returnFromFullScreen;
 
 - (void)renderImage:(MLImage *)image forSize:(CGSize)size;
+- (void)renderImageUsingBitmapContext:(MLImage *)image forSize:(CGSize)size;
+- (void)renderImageUsingWindowContext:(MLImage *)image forSize:(CGSize)size;
 - (void)preloadThread:(id)arg;
 @end

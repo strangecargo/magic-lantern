@@ -7,6 +7,7 @@
 //
 
 #import <Carbon/Carbon.h>
+#import <time.h>
 #import "MLImageWindowController.h"
 #import "MLImage.h"
 
@@ -22,6 +23,8 @@
 		fullScreenImageView = nil;
 		
 		directory = [[MLDirectory alloc] initWithPath:path];
+		
+		stopPreload = NO;
 	}
 	
 	return(self);
@@ -56,6 +59,7 @@
 
 - (void)windowWillClose:(NSNotification *)aNotification {
 	if(!fullScreenMode) {
+		stopPreload = YES;
 		[self autorelease];
 	}
 }
@@ -124,24 +128,32 @@
 	}
 }
 
+- (CGSize)visibleContentCGSize {
+	NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
+	NSRect visibleContentRect = [[self window] contentRectForFrameRect:visibleFrame];
+	
+	CGSize visibleContentSize;
+	visibleContentSize.height = visibleContentRect.size.height;
+	visibleContentSize.width = visibleContentRect.size.width;
+
+	return(visibleContentSize);
+}
+
 - (MLImageView *)activeImageView {
 	return(fullScreenMode ? fullScreenImageView : imageView);
 }
 
 - (void)updateViewWithImage:(MLImage *)newImage {
-	if(newImage != nil) {
-		NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
-		NSRect visibleContentRect = [[self window] contentRectForFrameRect:visibleFrame];
-		
-		CGSize visibleContentSize;
-		visibleContentSize.height = visibleContentRect.size.height;
-		visibleContentSize.width = visibleContentRect.size.width;
-		
+	if(newImage != nil) {		
 		MLImageView *activeView = [self activeImageView];
 		[[self window] setTitle:[[newImage path] lastPathComponent]];
-		[newImage setAvailableSize:visibleContentSize];
+		
+		[newImage lock];
+		[newImage setAvailableSize:[self visibleContentCGSize]];
 		[activeView setImage:newImage];
 		[self updateWindowFrameForImage:newImage];
+		[newImage unlock];
+		
 		[activeView setNeedsDisplay:YES];
 	}
 }
@@ -150,7 +162,7 @@
 	NSWindow *window = [self window];
 	NSRect currentContentRect = [window contentRectForFrameRect:[window frame]];
 	
-	CGSize newContentSize = [image maxImageSizeForAvailableSize];
+	CGSize newContentSize = [image scaledImageSizeForAvailableSize];
 	NSRect newContentRect = NSMakeRect(NSMinX(currentContentRect), NSMaxY(currentContentRect) - newContentSize.height, newContentSize.width, newContentSize.height);
 
 	if(!fullScreenMode) {
@@ -226,44 +238,86 @@
 }
 
 //threading junks
-- (void)preloadThread:(id)arg {
-	unsigned int i;
-	
-	NSLog(@"preload thread started.");
-		
-	for(i = 0; i < [directory count]; i++) {
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		MLImage *image = [[directory images] objectAtIndex:i];
 
+- (void)renderImage:(MLImage *)image forSize:(CGSize)size{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	[image lock];
+					
+	[image setAvailableSize:size];
+	
+	if([image shouldPreRender]) {
 		NSLog(@"Preloading %@", [image path]);
-		
-		NSRect visibleFrame = fullScreenMode ? [[NSScreen mainScreen] frame] : [[NSScreen mainScreen] visibleFrame];
-		NSRect visibleContentRect = [[self window] contentRectForFrameRect:visibleFrame];
-		
-		CGSize visibleContentSize;
-		visibleContentSize.height = visibleContentRect.size.height;
-		visibleContentSize.width = visibleContentRect.size.width;
-		
-		[image setAvailableSize:visibleContentSize];
-		
 		CIImage *ciImage = [image processedImage];
-		
+	
 		NSImageView *preloadView = [preloadWindow contentView];
 		[preloadView lockFocus];
-
-		NSGraphicsContext *nsContext = [NSGraphicsContext currentContext];
+	
+		NSGraphicsContext *nsContext = [NSGraphicsContext currentContext];	
 		CIContext *ciContext = [nsContext CIContext];
 		if(nsContext == nil) NSLog(@"current context nil");
-		
+	
 		//yeeeeah. this isn't in the header. but it *is* in the nm output!
-		[ciContext render:ciImage];
-		
-		[preloadView unlockFocus];
-		NSLog(@"Preloaded.");
-		
-		[pool release];
-	}
+		[image accumulateToRenderCache:ciImage];
+		[ciContext render:[image renderCacheImage]];
 
+		[preloadView unlockFocus];
+		NSLog(@"Preloaded.");		
+	}
+	
+	[image unlock];
+	[pool release];
+}
+
+- (void)preloadThread:(id)arg {
+	int i = 0;
+	struct timespec sleep_interval;
+	sleep_interval.tv_sec = 0;
+	sleep_interval.tv_nsec = 250000000;
+	
+	CGSize mostRecentVisibleSize = [self visibleContentCGSize];
+	NSArray *images = [directory images];
+	int centerIndex = [directory index];
+	
+	NSLog(@"preload thread started.");
+	
+	while(!stopPreload) {
+		i++;
+		BOOL withinBounds = NO;
+		int currentIndex = i + centerIndex;
+		
+		if(currentIndex < [directory count]) {
+			CGSize visibleSize = [self visibleContentCGSize];
+			if(visibleSize.height != mostRecentVisibleSize.height || visibleSize.width != mostRecentVisibleSize.width)
+				goto reset_loop;
+			[self renderImage:[images objectAtIndex:currentIndex] forSize:visibleSize];
+			withinBounds = YES;
+		}
+		
+		currentIndex = centerIndex - i;
+		if(currentIndex > 0) {
+			CGSize visibleSize = [self visibleContentCGSize];
+			if(visibleSize.height != mostRecentVisibleSize.height || visibleSize.width != mostRecentVisibleSize.width)
+				goto reset_loop;
+			[self renderImage:[images objectAtIndex:currentIndex] forSize:visibleSize];
+			withinBounds = YES;
+		}
+		
+		if(!withinBounds) {
+			nanosleep(&sleep_interval, NULL);
+			
+			CGSize visibleSize = [self visibleContentCGSize];
+			if(visibleSize.height != mostRecentVisibleSize.height || visibleSize.width != mostRecentVisibleSize.width)
+				goto reset_loop;			
+		}
+		continue;
+		
+reset_loop:
+		NSLog(@"resetting preload loop.");
+		i = 0;
+		centerIndex = [directory index];
+		mostRecentVisibleSize = [self visibleContentCGSize];
+	}
+	
 	NSLog(@"preload thread exiting.");
 	//[NSThread exit];
 }

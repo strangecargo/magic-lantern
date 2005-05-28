@@ -46,6 +46,7 @@
 		}
 		
 		[coreContext drawImage:ciImage atPoint:cgRect.origin fromRect:imageRect];
+		[image accumulateToRenderCache:ciImage];
 		[self unlockFocus];
 	}
 }

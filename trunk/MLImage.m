@@ -17,8 +17,10 @@
 	if(self) {
 		imagePath = filePath;
 
-		imageAccum = nil;
 		rotation = 0.0;
+
+		imageLock = [[NSLock alloc] init];
+		renderCacheAccumulator = nil;
 		
 		[imagePath retain];
 		
@@ -33,35 +35,71 @@
 	if(image != nil) {
 		[imagePath release];
 		[imageData release];
-		[image release];
-		
-		if(imageAccum != nil)
-			[imageAccum release];
+		[image release];		
 	}
-		
+	
+	[self releaseRenderCache];
+	[imageLock release];
+	
 	[super dealloc];
+}
+
+- (void)lock {
+	[imageLock lock];
+}
+
+- (void)unlock {
+	[imageLock unlock];
+}
+
+- (BOOL)shouldPreRender {
+	return(scaleFactor != 1.0 || rotation != 0.0);
+}
+
+- (void)releaseRenderCache {
+	if(renderCacheAccumulator != nil) {
+		NSLog(@"Releasing cache accumulator...");
+		[renderCacheAccumulator release];
+		renderCacheAccumulator = nil;
+	}
+}
+
+- (void) accumulateToRenderCache:(CIImage *)newCacheImage {
+	//only accumulate if we have nothing cached and the image needs scaling/transform.
+	if(renderCacheAccumulator == nil && (scaleFactor != 1.0 || rotation != 0.0)) {
+		NSLog(@"Accumulating new image for %@", imagePath);
+		renderCacheAccumulator = [[CIImageAccumulator alloc] initWithExtent:[newCacheImage extent] format:kCIFormatARGB8];
+		[renderCacheAccumulator setImage:newCacheImage];
+	}
+}
+
+- (CIImage *)renderCacheImage {
+	if(renderCacheAccumulator != nil) {
+		return([renderCacheAccumulator image]);
+	}
+	
+	return(nil);
 }
 
 - (void)rotateByDegrees:(float)degrees {
 	rotation += degrees;
+	rotation = (int)rotation % 360;
 	
-	[imageAccum release];
-	imageAccum = nil;
-	scaleFactor = [self maxImageSizeForAvailableSize].height / [[self transformedImage] extent].size.height;
-
+	scaleFactor = [self scaledImageSizeForAvailableSize].height / [[self transformedImage] extent].size.height;
+	[self releaseRenderCache];
 }
 
 - (void)setAvailableSize:(CGSize)newSize {
 	if(maxSize.height != newSize.height || maxSize.width != newSize.width) {
 		maxSize = newSize;
-		scaleFactor = [self maxImageSizeForAvailableSize].height / [[self transformedImage] extent].size.height;
+		scaleFactor = [self scaledImageSizeForAvailableSize].height / [[self transformedImage] extent].size.height;
+		[self releaseRenderCache];
+		
 		NSLog(@"Scalefactor: %f", scaleFactor);
-		[imageAccum release];
-		imageAccum = nil;
 	}
 }
 
-- (CGSize)maxImageSizeForAvailableSize {
+- (CGSize)scaledImageSizeForAvailableSize {
 	CGSize imageSize = [[self transformedImage] extent].size;
 	
 	//check to see if image can fit.
@@ -106,36 +144,23 @@
 	if(rotation == 0.0 && scaleFactor == 1.0)
 		return(image);
 	
-	if(imageAccum == nil) {
-		CIImage *intermediate = image;
-		
-		intermediate = [self transformedImage];
-
-		if(scaleFactor != 1.0) {
-			CIFilter *scaleFilter = [CIFilter filterWithName:@"CILanczosScaleTransform"];
-			[scaleFilter setDefaults];
-			[scaleFilter setValue:[NSNumber numberWithFloat:scaleFactor] forKey:@"inputScale"];
-			[scaleFilter setValue:intermediate forKey:@"inputImage"];
-			intermediate = [scaleFilter valueForKey:@"outputImage"];
-		}
-		
-		NSLog(@"Image accumulating: %@", imagePath);
-		[self accumulateImage:intermediate];
+	if(renderCacheAccumulator != nil) {
+		return([renderCacheAccumulator image]);
 	}
 	
-	return([imageAccum image]);
-	//return(intermediate);
-}
+	CIImage *intermediate = image;
+		
+	intermediate = [self transformedImage];
 
-- (void)accumulateImage:(CIImage *)newAccumImage {
-	if(imageAccum != nil) {
-		[imageAccum release];
-		imageAccum = nil;
+	if(scaleFactor != 1.0) {
+		CIFilter *scaleFilter = [CIFilter filterWithName:@"CILanczosScaleTransform"];
+		[scaleFilter setDefaults];
+		[scaleFilter setValue:[NSNumber numberWithFloat:scaleFactor] forKey:@"inputScale"];
+		[scaleFilter setValue:intermediate forKey:@"inputImage"];
+		intermediate = [scaleFilter valueForKey:@"outputImage"];
 	}
-	
-	imageAccum = [[CIImageAccumulator alloc] initWithExtent:[newAccumImage extent] format:kCIFormatARGB8];
-	[imageAccum setImage:newAccumImage];
-	//[imageAccum commitUpdates:nil];
+		
+	return(intermediate);
 }
 
 - (void)loadDataIfNeeded {

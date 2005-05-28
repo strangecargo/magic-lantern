@@ -18,21 +18,31 @@
 	NSData *imageData;
 	CIImage *image;
 	
-	CIImageAccumulator *imageAccum;
+	//render cache craps.
+	NSLock *imageLock;
+	CIImageAccumulator *renderCacheAccumulator;
+	
 	CGSize maxSize;
 }
 
+- (void)lock;
+- (void)unlock;
+
 - (id)initFromFilePath:(NSString *)filePath;
+
+- (BOOL)shouldPreRender;
+- (void) releaseRenderCache;
+- (void) accumulateToRenderCache:(CIImage *)newCacheImage;
+- (CIImage *)renderCacheImage;
 
 - (void)rotateByDegrees:(float)degrees;
 
 
 - (void)setAvailableSize:(CGSize)newSize;
-- (CGSize)maxImageSizeForAvailableSize;
+- (CGSize)scaledImageSizeForAvailableSize;
 
 - (CIImage *)transformedImage;
 - (CIImage *)processedImage;
-- (void)accumulateImage:(CIImage *)newAccumImage;
 
 - (void)loadDataIfNeeded;
 

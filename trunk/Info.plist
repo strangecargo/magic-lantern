@@ -11,6 +11,8 @@
 			<array>
 				<string>png</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>100kFireflies.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/png</string>
@@ -33,6 +35,8 @@
 			<array>
 				<string>gif</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>100kFireflies.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/gif</string>
@@ -55,6 +59,8 @@
 			<array>
 				<string>bmp</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>100kFireflies.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/bmp</string>
@@ -78,6 +84,8 @@
 				<string>tif</string>
 				<string>tiff</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>100kFireflies.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/tiff</string>
@@ -102,6 +110,8 @@
 				<string>jpeg</string>
 				<string>jpe</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>100kFireflies.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/jpeg</string>
@@ -125,6 +135,8 @@
 				<string>pct</string>
 				<string>pict</string>
 			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>100kFireflies.icns</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/pict</string>

@@ -24,6 +24,7 @@
 	MLImageView *fullScreenImageView;
 	
 	//threaded preloading
+	BOOL stopPreload;
 	NSThread *preloadThread;
 }
 
@@ -38,6 +39,7 @@
 - (void)prevImage;
 - (void)nextImage;
 
+- (CGSize)visibleContentCGSize;
 - (MLImageView *)activeImageView;
 - (void)updateViewWithImage:(MLImage *)newImage;
 - (void)updateWindowFrameForImage:(MLImage *)imag;
@@ -47,5 +49,6 @@
 - (void)goFullScreen;
 - (void)returnFromFullScreen;
 
+- (void)renderImage:(MLImage *)image forSize:(CGSize)size;
 - (void)preloadThread:(id)arg;
 @end

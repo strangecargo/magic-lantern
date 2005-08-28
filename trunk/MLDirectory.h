@@ -3,13 +3,14 @@
 //  Magic Lantern
 //
 //  Created by Allan Hsu on 5/21/05.
-//  Copyright 2005 __MyCompanyName__. All rights reserved.
+//  Copyright 2005 Allan Hsu. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
+#import "MLImageCollection.h"
 #import "MLImage.h"
 
-@interface MLDirectory : NSObject {
+@interface MLDirectory : NSObject <MLImageCollection> {
 	unsigned int imageIndex;
 	NSMutableArray *images;
 	NSString *dirPath;
@@ -19,17 +20,5 @@
 - (id)initWithFiles:(NSArray *)fileArray;
 - (void)loadDirectory;
 - (void)loadFromArray:(NSArray *)fileArray;
-
-- (MLImage *)currentImage;
-- (BOOL)hasPrevImage;
-- (BOOL)hasNextImage;
-- (MLImage *)prevImage;
-- (MLImage *)nextImage;
-
-- (NSArray *)images;
-
-- (unsigned int)count;
-- (unsigned int)index;
-- (void)setIndex:(unsigned int)newIndex;
 
 @end

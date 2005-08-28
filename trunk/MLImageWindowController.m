@@ -3,7 +3,7 @@
 //  Magic Lantern
 //
 //  Created by Allan Hsu on 5/19/05.
-//  Copyright 2005 __MyCompanyName__. All rights reserved.
+//  Copyright 2005 Allan Hsu. All rights reserved.
 //
 
 #import <Carbon/Carbon.h>
@@ -11,6 +11,8 @@
 #import "MLImageWindowController.h"
 #import "MLImage.h"
 
+#import "MLRarArchive.h"
+#import "MLDirectory.h"
 
 @implementation MLImageWindowController
 
@@ -22,7 +24,11 @@
 		fullScreenWindow = nil;
 		fullScreenImageView = nil;
 		
-		directory = [[MLDirectory alloc] initWithPath:path];
+		if([[path lowercaseString] hasSuffix:@".cbr"]) {
+			imageCollection = [[MLRarArchive alloc] initWithPath:path];
+		} else {
+			imageCollection = [[MLDirectory alloc] initWithPath:path];
+		}
 		
 		stopPreload = NO;
 	}
@@ -38,7 +44,7 @@
 		fullScreenWindow = nil;
 		fullScreenImageView = nil;
 		
-		directory = [[MLDirectory alloc] initWithFiles:fileNames];
+		imageCollection = [[MLDirectory alloc] initWithFiles:fileNames];
 	}
 	
 	return(self);
@@ -46,15 +52,15 @@
 
 - (void)dealloc {
 	NSLog(@"MLImageWindowController dealloc.");
-	[directory release];
+	[imageCollection release];
 	
 	[super dealloc];
 }
 
 - (void)windowDidLoad {
-	[self updateViewWithImage:[directory currentImage]];
+	[self updateViewWithImage:[imageCollection currentImage]];
 	
-	[NSThread detachNewThreadSelector:@selector(preloadThread:) toTarget:self withObject:nil];
+	//[NSThread detachNewThreadSelector:@selector(preloadThread:) toTarget:self withObject:nil];
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification {
@@ -91,7 +97,7 @@
 }
 
 - (void)rotateCCW {
-	MLImage *currentImage = [directory currentImage];
+	MLImage *currentImage = [imageCollection currentImage];
 	
 	if(currentImage != nil) {
 		[currentImage rotateByDegrees:90.0];
@@ -100,7 +106,7 @@
 }
 
 - (void)rotateCW {
-	MLImage *currentImage = [directory currentImage];
+	MLImage *currentImage = [imageCollection currentImage];
 	
 	if(currentImage != nil) {				
 		[currentImage rotateByDegrees:-90.0];
@@ -109,22 +115,22 @@
 }
 
 - (BOOL)hasPrevImage {
-	return([directory hasPrevImage]);
+	return([imageCollection hasPrevImage]);
 }
 
 - (BOOL)hasNextImage {
-	return([directory hasNextImage]);
+	return([imageCollection hasNextImage]);
 }
 
 - (void)prevImage {
-	if([directory hasPrevImage]) {
-		[self updateViewWithImage:[directory prevImage]];
+	if([imageCollection hasPrevImage]) {
+		[self updateViewWithImage:[imageCollection prevImage]];
 	}
 }
 
 - (void)nextImage {
-	if([directory hasNextImage]) {
-		[self updateViewWithImage:[directory nextImage]];
+	if([imageCollection hasNextImage]) {
+		[self updateViewWithImage:[imageCollection nextImage]];
 	}
 }
 
@@ -147,6 +153,7 @@
 	if(newImage != nil) {		
 		MLImageView *activeView = [self activeImageView];
 		[[self window] setTitle:[[newImage path] lastPathComponent]];
+		[[self window] setRepresentedFilename:[newImage path]];
 		
 		[newImage lock];
 		[newImage setAvailableSize:[self visibleContentCGSize]];
@@ -195,7 +202,8 @@
 	screenFrame.origin.x = 0;
 	screenFrame.origin.y = 0;
 	
-	normalWindow = [[self window] retain];
+	//normalWindow = [[self window] retain];
+	normalWindow = [self window];
 	[normalWindow orderOut:self];
 	
 	fullScreenWindow = [[MLFullScreenWindow alloc] initWithContentRect:screenFrame
@@ -210,13 +218,16 @@
 	[fullScreenWindow setContentView:fullScreenImageView];
 	[fullScreenWindow setBackgroundColor:[NSColor blackColor]];
 
-	[self setWindow:fullScreenWindow];
+	//[self setWindow:fullScreenWindow];
+	[fullScreenWindow setWindowController:self];
+	[fullScreenWindow setDelegate:self];
+	
 	[fullScreenWindow makeKeyAndOrderFront:self];
 	
 	if(thisScreen == zeroScreen)
 		SetSystemUIMode(kUIModeAllHidden, 0);
 	
-	[self updateViewWithImage:[directory currentImage]];
+	[self updateViewWithImage:[imageCollection currentImage]];
 	[NSCursor hide];
 }
 
@@ -229,8 +240,10 @@
 				
 	SetSystemUIMode(kUIModeNormal, 0);
 	
-	[self updateViewWithImage:[directory currentImage]];
-	[self showWindow:self];
+	[self updateViewWithImage:[imageCollection currentImage]];
+	//[self showWindow:self];
+	[normalWindow makeKeyAndOrderFront:self];
+	
 	[NSCursor unhide];	
 	
 	[fullScreenWindow release];
@@ -329,8 +342,7 @@
 	sleep_interval.tv_nsec = 250000000;
 	
 	CGSize mostRecentVisibleSize = [self visibleContentCGSize];
-	NSArray *images = [directory images];
-	int centerIndex = [directory index];
+	int centerIndex = [imageCollection index];
 	
 	NSLog(@"preload thread started.");
 	
@@ -340,11 +352,11 @@
 		int currentIndex = i + centerIndex;
 		
 		
-		if(currentIndex < [directory count]) {
+		if(currentIndex < [imageCollection count]) {
 			CGSize visibleSize = [self visibleContentCGSize];
 			if(visibleSize.height != mostRecentVisibleSize.height || visibleSize.width != mostRecentVisibleSize.width)
 				goto reset_loop;
-			[self renderImage:[images objectAtIndex:currentIndex] forSize:visibleSize];
+			[self renderImage:[imageCollection imageAtIndex:currentIndex] forSize:visibleSize];
 			withinBounds = YES;
 		}
 		
@@ -353,7 +365,7 @@
 			CGSize visibleSize = [self visibleContentCGSize];
 			if(visibleSize.height != mostRecentVisibleSize.height || visibleSize.width != mostRecentVisibleSize.width)
 				goto reset_loop;
-			[self renderImage:[images objectAtIndex:currentIndex] forSize:visibleSize];
+			[self renderImage:[imageCollection imageAtIndex:currentIndex] forSize:visibleSize];
 			withinBounds = YES;
 		}
 		
@@ -369,7 +381,7 @@
 reset_loop:
 		NSLog(@"resetting preload loop.");
 		i = 0;
-		centerIndex = [directory index];
+		centerIndex = [imageCollection index];
 		mostRecentVisibleSize = [self visibleContentCGSize];
 	}
 	

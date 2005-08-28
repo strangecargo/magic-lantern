@@ -3,17 +3,17 @@
 //  Magic Lantern
 //
 //  Created by Allan Hsu on 5/19/05.
-//  Copyright 2005 __MyCompanyName__. All rights reserved.
+//  Copyright 2005 Allan Hsu. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 #import "MLImageView.h"
-#import "MLDirectory.h"
+#import "MLImageCollection.h"
 #import "MLFullScreenWindow.h"
 
 @interface MLImageWindowController : NSWindowController {
 
-	MLDirectory *directory;
+	NSObject <MLImageCollection> *imageCollection;
 	IBOutlet MLImageView *imageView;
 	IBOutlet NSWindow *preloadWindow;
 	

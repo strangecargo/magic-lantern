@@ -104,7 +104,7 @@
 }
 
 - (BOOL)hasPrevImage {
-	return(imageIndex > 0);
+	return(imageIndex > 0 && [images count] > 0);
 }
 
 - (BOOL)hasNextImage {
@@ -133,8 +133,8 @@
 	return(nil);
 }
 
-- (NSArray *)images {
-	return(images);
+- (MLImage *)imageAtIndex:(unsigned int)index {
+	return([images objectAtIndex:index]);
 }
 
 - (unsigned int)count {

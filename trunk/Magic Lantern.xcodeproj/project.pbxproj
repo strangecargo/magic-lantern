@@ -15,6 +15,7 @@
 		9D44813F083DD47C00ECB988 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D44813E083DD47C00ECB988 /* QuartzCore.framework */; };
 		9D7FD3DF083B11DF002051D0 /* MLMainController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7FD3DE083B11DF002051D0 /* MLMainController.m */; };
 		9D842773084849C100758359 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D842772084849C100758359 /* ApplicationServices.framework */; };
+		9DA37E2008C1A1FC00E3F111 /* MLRarArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DA37E1F08C1A1FC00E3F111 /* MLRarArchive.m */; };
 		9DC0F1EB083B2623004548E9 /* 100kFireflies.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9DC0F1EA083B2623004548E9 /* 100kFireflies.icns */; };
 		9DD100FB083F1B590069E5E6 /* MLImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD100FA083F1B590069E5E6 /* MLImage.m */; };
 		9DD10120083F34EF0069E5E6 /* MLDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD1011F083F34EF0069E5E6 /* MLDirectory.m */; };
@@ -78,6 +79,9 @@
 		9D7FD3DD083B11DF002051D0 /* MLMainController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MLMainController.h; sourceTree = "<group>"; };
 		9D7FD3DE083B11DF002051D0 /* MLMainController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MLMainController.m; sourceTree = "<group>"; };
 		9D842772084849C100758359 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
+		9DA37E1E08C1A1FC00E3F111 /* MLRarArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MLRarArchive.h; sourceTree = "<group>"; };
+		9DA37E1F08C1A1FC00E3F111 /* MLRarArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MLRarArchive.m; sourceTree = "<group>"; };
+		9DA37E9808C1A94100E3F111 /* MLImageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MLImageCollection.h; sourceTree = "<group>"; };
 		9DC0F1EA083B2623004548E9 /* 100kFireflies.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = 100kFireflies.icns; sourceTree = "<group>"; };
 		9DD100F9083F1B590069E5E6 /* MLImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MLImage.h; sourceTree = "<group>"; };
 		9DD100FA083F1B590069E5E6 /* MLImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MLImage.m; sourceTree = "<group>"; };
@@ -126,6 +130,9 @@
 				9DD10190083FC7410069E5E6 /* Utility.m */,
 				9DD10676084097DC0069E5E6 /* MLFullScreenWindow.h */,
 				9DD10677084097DC0069E5E6 /* MLFullScreenWindow.m */,
+				9DA37E1E08C1A1FC00E3F111 /* MLRarArchive.h */,
+				9DA37E1F08C1A1FC00E3F111 /* MLRarArchive.m */,
+				9DA37E9808C1A94100E3F111 /* MLImageCollection.h */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -281,6 +288,7 @@
 				9DD10120083F34EF0069E5E6 /* MLDirectory.m in Sources */,
 				9DD10191083FC7410069E5E6 /* Utility.m in Sources */,
 				9DD10678084097DC0069E5E6 /* MLFullScreenWindow.m in Sources */,
+				9DA37E2008C1A1FC00E3F111 /* MLRarArchive.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +382,7 @@
 		9D68C05D08551F3600550AC0 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PREBINDING = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
@@ -387,6 +396,7 @@
 					ppc,
 					i386,
 				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PREBINDING = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
@@ -396,6 +406,7 @@
 		9D68C05F08551F3600550AC0 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PREBINDING = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;

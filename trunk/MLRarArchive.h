@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import <unrar/unrar.h>
+
 #import "MLImageCollection.h"
 
 @interface MLRarArchive : NSObject <MLImageCollection> {

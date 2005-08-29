@@ -20,6 +20,13 @@
 			[self release];
 			return(nil);
 		}
+		
+		struct RAROpenArchiveData rarOAD;
+		rarOAD.ArcName = (char *)[path fileSystemRepresentation];
+		rarOAD.OpenMode = RAR_OM_LIST;
+		void *blargle = RAROpenArchive(&rarOAD);
+		
+		
 		/*
 		imageNames = [[NSMutableArray alloc] init];
 		imageCache = [[NSMutableDictionary alloc] init];

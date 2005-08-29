@@ -60,7 +60,7 @@
 - (void)windowDidLoad {
 	[self updateViewWithImage:[imageCollection currentImage]];
 	
-	//[NSThread detachNewThreadSelector:@selector(preloadThread:) toTarget:self withObject:nil];
+	[NSThread detachNewThreadSelector:@selector(preloadThread:) toTarget:self withObject:nil];
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification {

@@ -16,6 +16,8 @@
 		9D7FD3DF083B11DF002051D0 /* MLMainController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7FD3DE083B11DF002051D0 /* MLMainController.m */; };
 		9D842773084849C100758359 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D842772084849C100758359 /* ApplicationServices.framework */; };
 		9DA37E2008C1A1FC00E3F111 /* MLRarArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DA37E1F08C1A1FC00E3F111 /* MLRarArchive.m */; };
+		9DA3850808C2923300E3F111 /* unrar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DA3850308C291C400E3F111 /* unrar.framework */; };
+		9DA3851D08C296CD00E3F111 /* unrar.framework in Copy Unrar Framework */ = {isa = PBXBuildFile; fileRef = 9DA3850308C291C400E3F111 /* unrar.framework */; };
 		9DC0F1EB083B2623004548E9 /* 100kFireflies.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9DC0F1EA083B2623004548E9 /* 100kFireflies.icns */; };
 		9DD100FB083F1B590069E5E6 /* MLImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD100FA083F1B590069E5E6 /* MLImage.m */; };
 		9DD10120083F34EF0069E5E6 /* MLDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DD1011F083F34EF0069E5E6 /* MLDirectory.m */; };
@@ -63,6 +65,37 @@
 		};
 /* End PBXBuildStyle section */
 
+/* Begin PBXContainerItemProxy section */
+		9DA3850208C291C400E3F111 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9DA384FE08C291C400E3F111 /* unrar.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = unrar;
+		};
+		9DA3850D08C2930F00E3F111 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9DA384FE08C291C400E3F111 /* unrar.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = unrar;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9DA3850908C2925400E3F111 /* Copy Unrar Framework */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9DA3851D08C296CD00E3F111 /* unrar.framework in Copy Unrar Framework */,
+			);
+			name = "Copy Unrar Framework";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -82,6 +115,7 @@
 		9DA37E1E08C1A1FC00E3F111 /* MLRarArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MLRarArchive.h; sourceTree = "<group>"; };
 		9DA37E1F08C1A1FC00E3F111 /* MLRarArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MLRarArchive.m; sourceTree = "<group>"; };
 		9DA37E9808C1A94100E3F111 /* MLImageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MLImageCollection.h; sourceTree = "<group>"; };
+		9DA384FE08C291C400E3F111 /* unrar.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = unrar.xcodeproj; path = ../../unrar/trunk/src/unrar.xcodeproj; sourceTree = SOURCE_ROOT; };
 		9DC0F1EA083B2623004548E9 /* 100kFireflies.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = 100kFireflies.icns; sourceTree = "<group>"; };
 		9DD100F9083F1B590069E5E6 /* MLImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MLImage.h; sourceTree = "<group>"; };
 		9DD100FA083F1B590069E5E6 /* MLImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MLImage.m; sourceTree = "<group>"; };
@@ -103,6 +137,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DA3850808C2923300E3F111 /* unrar.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				9D44813F083DD47C00ECB988 /* QuartzCore.framework in Frameworks */,
 				9D2A1F530841581F00D9C179 /* Carbon.framework in Frameworks */,
@@ -169,6 +204,7 @@
 		29B97314FDCFA39411CA2CEA /* Magic Lantern */ = {
 			isa = PBXGroup;
 			children = (
+				9DA384FE08C291C400E3F111 /* unrar.xcodeproj */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -208,6 +244,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		9DA384FF08C291C400E3F111 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9DA3850308C291C400E3F111 /* unrar.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -216,6 +260,7 @@
 			buildConfigurationList = 9D68C05808551F3600550AC0 /* Build configuration list for PBXNativeTarget "Magic Lantern" */;
 			buildPhases = (
 				8D1107290486CEB800E47090 /* Resources */,
+				9DA3850908C2925400E3F111 /* Copy Unrar Framework */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 			);
@@ -233,6 +278,7 @@
 				WRAPPER_EXTENSION = app;
 			};
 			dependencies = (
+				9DA3850E08C2930F00E3F111 /* PBXTargetDependency */,
 			);
 			name = "Magic Lantern";
 			productInstallPath = "$(HOME)/Applications";
@@ -255,11 +301,27 @@
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Magic Lantern */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 9DA384FF08C291C400E3F111 /* Products */;
+					ProjectRef = 9DA384FE08C291C400E3F111 /* unrar.xcodeproj */;
+				},
+			);
 			targets = (
 				8D1107260486CEB800E47090 /* Magic Lantern */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		9DA3850308C291C400E3F111 /* unrar.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = unrar.framework;
+			remoteRef = 9DA3850208C291C400E3F111 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D1107290486CEB800E47090 /* Resources */ = {
@@ -294,6 +356,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		9DA3850E08C2930F00E3F111 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = unrar;
+			targetProxy = 9DA3850D08C2930F00E3F111 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
@@ -314,7 +384,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		9D68C05908551F3600550AC0 /* Development */ = {
+		9D68C05908551F3600550AC0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
@@ -336,9 +406,9 @@
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
-			name = Development;
+			name = Debug;
 		};
-		9D68C05A08551F3600550AC0 /* Deployment */ = {
+		9D68C05A08551F3600550AC0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
@@ -362,7 +432,7 @@
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
-			name = Deployment;
+			name = Release;
 		};
 		9D68C05B08551F3600550AC0 /* Default */ = {
 			isa = XCBuildConfiguration;
@@ -379,7 +449,7 @@
 			};
 			name = Default;
 		};
-		9D68C05D08551F3600550AC0 /* Development */ = {
+		9D68C05D08551F3600550AC0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -387,9 +457,9 @@
 				PREBINDING = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
-			name = Development;
+			name = Debug;
 		};
-		9D68C05E08551F3600550AC0 /* Deployment */ = {
+		9D68C05E08551F3600550AC0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
@@ -401,7 +471,7 @@
 				PREBINDING = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
-			name = Deployment;
+			name = Release;
 		};
 		9D68C05F08551F3600550AC0 /* Default */ = {
 			isa = XCBuildConfiguration;
@@ -419,8 +489,8 @@
 		9D68C05808551F3600550AC0 /* Build configuration list for PBXNativeTarget "Magic Lantern" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9D68C05908551F3600550AC0 /* Development */,
-				9D68C05A08551F3600550AC0 /* Deployment */,
+				9D68C05908551F3600550AC0 /* Debug */,
+				9D68C05A08551F3600550AC0 /* Release */,
 				9D68C05B08551F3600550AC0 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -429,8 +499,8 @@
 		9D68C05C08551F3600550AC0 /* Build configuration list for PBXProject "Magic Lantern" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9D68C05D08551F3600550AC0 /* Development */,
-				9D68C05E08551F3600550AC0 /* Deployment */,
+				9D68C05D08551F3600550AC0 /* Debug */,
+				9D68C05E08551F3600550AC0 /* Release */,
 				9D68C05F08551F3600550AC0 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
